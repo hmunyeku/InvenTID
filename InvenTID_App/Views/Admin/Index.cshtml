@@ -1,0 +1,20 @@
+﻿@model IEnumerable<InvenTID_App.Models.ApplicationUser>
+@{
+    ViewBag.Title = "RBAC Administration";
+}
+
+<fieldset>
+    <legend>
+        <h3 style="font-weight:bold; font-size:x-large">
+            System Users
+        </h3>
+    </legend>
+</fieldset>
+
+
+@Html.Partial("_ListUserTable", Model)
+<br />
+<div>
+    <input class="btn btn-default" type="button" value="Create User" onclick="location.href='@Url.Action("Register", "Account")'" />
+    <br />
+</div>

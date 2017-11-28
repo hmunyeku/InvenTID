@@ -1,0 +1,11 @@
+﻿utiliser-outil (check-in, check-out)
+editer-outil
+declarer-incident
+imprimer-liste
+afficher-status
+gerer-utilisateurs
+gerer-outils (lister)
+gerer-listes (site d'operations, categorie, type d'outils)
+faire-inventaire
+valider-inventaire
+reception-lot

@@ -1,0 +1,107 @@
+﻿@model IEnumerable<InvenTID_App.Models.PARAMETER>
+@{
+    ViewBag.Title = "Application Settings";
+}
+
+<fieldset>
+    <legend>
+        <h3 style="font-weight:bold; font-size:x-large">
+            Settings        
+        </h3>
+    </legend>
+</fieldset>
+    <p>
+        <br />This area provides a set of options which help to adjust the application to your needs.
+    </p><br />
+    <div class="tabbable">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#1" data-toggle="tab">General</a></li>
+            <li><a href="#2" data-toggle="tab">Registration</a></li>
+            <li><a href="#3" data-toggle="tab">Outgoing Mail Server</a></li>
+        </ul>
+        <form class="form-horizontal" method="post" id="settings-form" style="width:100%">
+            <div class="tab-content">
+                <div class="tab-pane fade active in" id="1">
+                    <fieldset>
+                        <h3>General</h3>
+                        @{Html.RenderPartial(@"~/Views/Admin/_GeneralSettings.cshtml", Model);}
+                    </fieldset>
+                </div>
+                <div class="tab-pane fade" id="2">
+                    <fieldset>
+                        <h3>User Registration</h3>
+                        @{Html.RenderPartial(@"~/Views/Admin/_RegistrationSettings.cshtml", Model);}
+                    </fieldset>
+                </div>
+                <div class="tab-pane fade" id="3">
+                    <fieldset>
+                        <h3>Outgoing Mail Server</h3>
+                        @{Html.RenderPartial(@"~/Views/Admin/_SmtpSettings.cshtml", Model);}
+                    </fieldset>
+                </div>		
+            </div>
+            <div class="form-actions">
+                <button data-loading-text="Saving..." data-complete-text="Changes saved" name="save-settings" class="btn btn-primary save-settings btn-small">Save changes</button>
+            </div>
+        </form>
+    </div>
+
+<script>
+        $(".save-settings").bind("click", function (e) {
+            e.preventDefault();
+
+            $(".save-settings").button('loading')
+
+            var setting = [];
+            $(".app-settings").each(function (e) {
+                var Param = {
+                    Name: $(this).attr("id"),
+                    Value: $(this).val()
+                };
+
+                if ($(this).attr("type") == "checkbox") {
+                    Param.Value = $(this).is(':checked')
+                } else if ($(this).attr("type") == "radio") {
+                    if ($(this).is(':checked')) {
+                        Param.Value = $(this).val();
+                        Param.Name = $(this).attr("Name");
+                    }
+                    else
+                        Param = null;
+                }
+
+                if (Param != null)
+                    setting.push(Param);
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveSettings","Admin")",
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(setting),
+                cache: false,
+                success: function (data) {
+                    $(".save-settings").button('reset')
+
+                    BootstrapDialog.alert({
+                        title: 'WARNING',
+                        message: data.Message,
+                        type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+                        closable: true, // <-- Default value is false
+                        draggable: true, // <-- Default value is false
+                        callback: function (result) {
+                            window.location.href = '/';
+                        }
+                    });
+
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    BootstrapDialog.alert("An error occured during updating application settings !");
+                    $(".save-settings").button('reset')
+                }
+            });
+
+            return false;
+        })
+    </script>

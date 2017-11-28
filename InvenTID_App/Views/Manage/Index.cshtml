@@ -1,0 +1,53 @@
+﻿@model InvenTID_App.Models.IndexViewModel
+@{
+    ViewBag.Title = "Manage";
+}
+
+<div>
+    <table>
+        <td class="rbac-formtitle">@ViewBag.Title<p class="rbac-formtitlesub">Manage your account settings</p></td>
+    </table>
+</div>
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+<div>
+    <hr />
+
+    <table>
+        <tr>
+            <td>
+                [
+                @if (Model.HasPassword)
+                {
+                    @Html.ActionLink("Change password", "ChangePassword")
+                }
+                else
+                {
+                    @Html.ActionLink("Create", "SetPassword")
+                }
+                ]
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <br />
+                <strong>Phone number :</strong>  @(Model.PhoneNumber ?? "None") [
+                @if (Model.PhoneNumber != null)
+                {
+                    @Html.ActionLink("Change", "AddPhoneNumber")
+                    @: &nbsp;|&nbsp;
+                    @Html.ActionLink("Remove", "RemovePhoneNumber")
+                }
+                else
+                {
+                    @Html.ActionLink("Add", "AddPhoneNumber")
+                }
+                ]
+            </td>
+        </tr>
+    </table>
+
+
+
+
+</div>

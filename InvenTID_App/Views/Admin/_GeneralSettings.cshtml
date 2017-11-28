@@ -1,0 +1,51 @@
+﻿@model IEnumerable<InvenTID_App.Models.PARAMETER>
+@{
+    ApplicationParameters AppParams = new ApplicationParameters();
+    var general_audit_enabled = AppParams.GeneralAuditEnabled;
+    var general_app_maintenance_url = AppParams.GeneralMaintenanceUrl;
+    var general_app_maintenance_enabled = AppParams.GeneralMaintenanceEnabled;
+    var general_app_maintenance_allowedIPs = AppParams.GeneralMaintenanceAllowedIPs;
+
+}
+
+<div style="margin-top:20px;">
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@general_audit_enabled.Name">Audit</label>
+        <div class="col-md-4">
+            <div class="checkbox">
+                <label for="@general_audit_enabled.Name">
+                    <input type="checkbox" class="app-settings" id="@general_audit_enabled.Name" name="@general_audit_enabled.Name" @if (general_audit_enabled.Value == "true")  { @Html.Raw("checked") } />
+                    Enable audit functionality
+                </label>
+            </div>
+        </div>
+    </div>
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@general_app_maintenance_url.Name">Maintenance Time URL</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control input-md app-settings" id="@general_app_maintenance_url.Name" name="@general_app_maintenance_url.Name" value="@general_app_maintenance_url.Value">
+            <span class="help-block">Local or external path of maintenance page</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@general_app_maintenance_enabled.Name">Maintenance Time</label>
+        <div class="col-md-4">
+            <div class="checkbox">
+                <label for="@general_app_maintenance_enabled.Name">
+                    <input type="checkbox" class="app-settings" id="@general_app_maintenance_enabled.Name" name="@general_app_maintenance_enabled.Name" @if (general_app_maintenance_enabled.Value == "true")    { @Html.Raw("checked")        } />
+                    Switch to the maintenance mode
+                </label>
+            </div>
+        </div>
+    </div>
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@general_app_maintenance_allowedIPs.Name">Allowed IPs</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control input-md app-settings" id="@general_app_maintenance_allowedIPs.Name" name="@general_app_maintenance_allowedIPs.Name" value="@general_app_maintenance_allowedIPs.Value">
+            <span class="help-block">List Allowed IPs; separted by semicolon</span>
+        </div>
+    </div>
+</div>
+       

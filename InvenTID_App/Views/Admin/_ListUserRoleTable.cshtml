@@ -1,0 +1,75 @@
+﻿@model InvenTID_App.Models.ApplicationUser
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.bin').attr('href', 'javascript://');
+        $('.bin').click(function () {
+            id = $(this).attr('id');
+            if (id == 1) { BootstrapDialog.alert("This action is not allow in Demo mode."); return; }
+
+            BootstrapDialog.confirm({
+                title: 'WARNING',
+                message: 'Do you wish to delete this Role?',
+                type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+                callback: function (result) {
+                    if (result) {
+                        var _url = window.location;
+                        var _userId = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+                        var _id = id;
+                        var _parameters = { userId: _userId, id: _id };
+                        $.ajax({
+                            url: "/Admin/DeleteUserRoleReturnPartialView",
+                            type: "GET",
+                            data: _parameters,
+                            success: function (data, textStatus, jqXHR) {
+                                $('#RolesTable').html(data);
+                            }
+                        });
+                    }
+                }
+            });
+        });
+	})
+</script>
+
+@{if (Model.Roles.Count == 0)
+{
+	<h2><font color="red">No Associated Roles...</font></h2>
+	<br />
+}
+else
+{
+	<table id="RoleTable" style="width: 800px" class="table table-condensed"  >
+		<thead>
+            <tr>
+                <th style="width: 30%">
+                    Role
+                </th>
+                <th style="width: 60%">
+                    Description
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+		</thead>
+		@foreach (var role in Model.Roles.OrderBy(r => r.RoleId))
+		{
+			<tr>
+				<td>
+					@Html.ActionLink(role.Role.Name, "RoleDetails", new { id = role.RoleId })
+				</td>
+				<td>
+					@role.Role.RoleDescription
+				</td>
+				<td>
+                    <a href="#" class="bin btn btn-xs btn-danger" id=@role.RoleId>
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </a>
+				</td>
+			</tr>
+		}
+	</table>
+	<br />
+}
+}
+<br />

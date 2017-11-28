@@ -1,0 +1,71 @@
+﻿@model InvenTID_App.Models.PERMISSION
+<script type="text/javascript">
+    $(document).ready(function () {
+        //Unbind the original image 'href' set by the controller...
+        $('.deleteRole').attr('href', 'javascript://');
+        $('.deleteRole').click(function () {
+            perm = $(this).attr('permissionId');
+            roleid = $(this).attr('roleId');
+            BootstrapDialog.confirm({
+                title: 'WARNING',
+                message: "Warning: This will remove the selected Role from this Permission.  Removing this Role may prevent users from accessing areas in the application.  Only remove this Role if you intend to restrict application access.<br/><br/>Do you wish to continue?",
+                type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+                callback: function (result) {
+                    if (result) {
+                        var _permissionId = perm;
+                        var _roleId = roleid;
+                        var _parameters = { permissionId: _permissionId, id: _roleId };
+                        $.ajax({
+                            url: "/Admin/DeleteRoleFromPermissionReturnPartialView",
+                            type: "GET",
+                            data: _parameters,
+                            success: function (data, textStatus, jqXHR) {
+                                $('#RolesTable').html(data);
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
+@{if (Model.ROLES.Count == 0)
+{
+    <h2><font color="red">No Associated Roles...</font></h2>
+    <br />
+}
+else
+{
+    <table id="PermissionTable" style="width: 800px" class="table table-condensed" >
+        <tr>
+        <th style="width:40%">
+            Role
+        </th>
+        <th>
+            Role Description
+        </th>
+        <th>
+            Action
+        </th>
+        </tr>
+        @foreach (var role in Model.ROLES.OrderBy(u => u.RoleDescription))
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(role.Name, "RoleDetails", new { id = role.Id })
+                </td>
+                <td>
+                    @role.RoleDescription
+                </td>
+                <td>
+                    <center>
+                        <a href="@Url.Action("DeletePermission", "Admin", new { id = role.Id, permissionId = Model.PermissionId })" class="deleteRole btn btn-xs btn-danger" permissionid=@Model.PermissionId roleid=@role.Id>
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </center>
+                </td>
+            </tr>
+        }
+    </table>
+    <br />
+}}

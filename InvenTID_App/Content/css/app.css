@@ -1,0 +1,144 @@
+﻿html, body {
+    background-color: #ffffff;
+    font: 14px Antenna, Tahoma, Geneva, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: auto;
+}
+
+.fileTabtemplateDiv {
+    background: url("../img/logo_act.png") no-repeat center;
+    width: 150px;
+    height: 100%;
+}
+
+.dxr-fileTab {
+    pointer-events: none;
+}
+
+.content-wrapper {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: 5px 5px;
+}
+
+.header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid darkgrey;
+}
+
+.content {
+    background: #ffffff;
+    padding: 10px 10px 10px 10px;
+    width: 100%;
+    /*border: 1px solid darkgray;*/
+    overflow: auto;
+    margin-bottom: 37px;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 35px;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid darkgrey;
+}
+
+    .footer div {
+        display: inline-block;
+    }
+
+.footer-left {
+    padding-left: 10px;
+    width: 15%;
+    height: 35px;
+    float: left;
+}
+
+.footer-right {
+    width: 10%;
+    height: 35px;
+    float: right;
+    /*margin: 5px;*/
+}
+
+.footer-center {
+    width: 70%;
+    height: 35px;
+    /*margin: 5px;*/
+    /*float: right;*/
+}
+
+.logo_bin {
+    right: 0;
+    display: block;
+    margin: 6px;
+    padding: 0;
+    float: right;
+}
+
+.led {
+    margin: 5.6px auto;
+    width: 22px;
+    height: 22px;
+    background-color: #dcdcdc;
+    border: solid 1px darkgray;
+    border-radius: 20%;
+    cursor: pointer;
+    /*box-shadow: #000 0 -1px 6px 1px;*/
+}
+
+.rfid_scanner_error {
+    background: url("../img/rfid_disconnect.png") no-repeat center;
+}
+
+.rfid_scanner_ok {
+    background: url("../img/rfid_connect.png") no-repeat center;
+}
+
+.rfid_reading_read {
+    background: url("../img/rfid_read.png") no-repeat center;
+}
+
+.user-name {
+    margin: 5.6px auto 5.6px 3px;
+    position: absolute;
+}
+
+.username-logo {
+    margin: 5.6px auto;
+    background: url("../img/clienticon.png") no-repeat center;
+    width: 22px;
+    height: 22px;
+}
+
+.menu-bar {
+    clear: both;
+    width: inherit;
+    height: auto;
+    position: static;
+    margin-bottom: 10px;
+}
+
+.permission {
+    width: 100%;
+}
+
+.permission-add {
+    float: left;
+    width: 30%;
+}
+.permission-list {
+    float: right;
+    width: 70%;
+    margin-left: 10px;
+}

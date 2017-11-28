@@ -1,0 +1,21 @@
+﻿@model IEnumerable<InvenTID_App.Models.PERMISSION>
+@{
+    ViewBag.Title = "Permissions";
+}
+
+<div class="permission">
+    <div class="menu-bar">
+        <input class="btn btn-default" type="button" value="Editer les rôles" onclick="location.href='@Url.Action("RoleIndex", "Admin")'" />
+        <input class="btn btn-default" type="button" value="Créer une permission" onclick="location.href = '@Url.Action("PermissionCreate", "Admin")'"/>
+        <input class="btn btn-success" type="button" id="Importer une permission" name="importPermissions2" value="Import Permissions" onclick="location.href = '@Url.Action("PermissionsImport", "Admin")'"/>
+        <br/>
+    </div>
+    <div class="permission-add">
+
+    </div>
+    <div class="permission-list">
+        @Html.Partial("_ListPermissionsTable", Model)
+    </div>
+</div>
+
+

@@ -1,0 +1,54 @@
+﻿@model InvenTID_App.Models.RoleViewModel
+@{
+    ViewBag.Title = "Create Role";
+}
+
+<div class="">
+    @using (Html.BeginForm())
+    {
+        @Html.ValidationSummary(true)    
+        <fieldset>
+            <legend>
+                <h3 style="font-weight:bold; font-size:x-large">
+                    Create Role
+                </h3>
+            </legend>
+            <table style='width: 100%'>
+                <tr>
+                    <td style='width: 120px;font-weight: bold'>
+                        @Html.LabelFor(model => model.RoleName, new { @class = "control-label" })
+                    </td>
+                    <td>
+                        @Html.TextBoxFor(model => model.RoleName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.RoleName)
+                    </td>
+                </tr>
+                <tr>
+                    <td style='font-weight: bold'>
+                        @Html.LabelFor(model => model.RoleDescription, new { @class = "control-label", style = "vertical-align:top" })
+                    </td>
+                    <td>
+                        @Html.TextAreaFor(model => model.RoleDescription, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.RoleDescription)
+                    </td>
+                </tr>
+                <tr>
+                    <td style='font-weight: bold'>
+                        @Html.LabelFor(model => model.IsSysAdmin, "System Role")
+                    </td>
+                    <td>
+                        @Html.CheckBoxFor(model => model.IsSysAdmin, new { @disabled = "disabled" }) &nbsp; &nbsp;<span>(Not allow in demo mode)</span>
+
+                        @Html.ValidationMessageFor(model => model.IsSysAdmin)
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <input class="btn btn-default" type="submit" value="Create Role" />
+        </fieldset>
+    }
+</div>
+<br />
+<div>
+    @Html.ActionLink("Go to Roles", "RoleIndex", "Admin")
+</div>

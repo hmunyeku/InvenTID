@@ -1,0 +1,67 @@
+﻿@model IEnumerable<InvenTID_App.Models.PARAMETER>
+@{
+    ApplicationParameters AppParams = new ApplicationParameters();
+    var registration_SmtpServer = AppParams.SmtpServer;
+    var registration_SmtpUsername = AppParams.SmtpUsername;
+    var registration_SmtpEMailFrom = AppParams.SmtpEMailFrom;
+    var registration_SmtpPassword = AppParams.SmtpPassword;
+    var registration_SmtpPort = AppParams.SmtpPort;
+    var registration_SmtpNetworkDeliveryMethodEnabled = AppParams.SmtpNetworkDeliveryMethodEnabled;
+
+}
+    <div style="margin-top:20px;">
+
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="@registration_SmtpEMailFrom.Name">SMTP Host</label>
+            <div class="col-md-8">
+                <input type="text" class="form-control input-md app-settings" id="@registration_SmtpEMailFrom.Name" name="@registration_SmtpEMailFrom.Name" value="@registration_SmtpEMailFrom.Value">
+                <span class="help-block">SMTP server host used for sending emails (e.g. smtp.domainname.com)</span>
+            </div>
+        </div>
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="@registration_SmtpUsername.Name">SMTP User Name</label>
+            <div class="col-md-8">
+                <input type="text" class="form-control input-md app-settings" id="@registration_SmtpUsername.Name" name="@registration_SmtpUsername.Name" value="@registration_SmtpUsername.Value">
+                <span class="help-block">The user name for SMTP account used for sending emails</span>
+            </div>
+        </div>
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="@registration_SmtpEMailFrom.Name">SMTP User Email</label>
+            <div class="col-md-8">
+                <input type="text" class="form-control input-md app-settings" id="@registration_SmtpEMailFrom.Name" name="@registration_SmtpEMailFrom.Name" value="@registration_SmtpEMailFrom.Value">
+                <span class="help-block">The user email for SMTP account used for sending emails</span>
+            </div>
+        </div>
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="@registration_SmtpPassword.Name">SMTP Password</label>
+            <div class="col-md-8">
+                <input type="password" class="form-control input-md app-settings" id="@registration_SmtpPassword.Name" name="@registration_SmtpPassword.Name" value="@registration_SmtpPassword.Value">
+                <span class="help-block">The password for the SMTP account used for sending emails</span>
+            </div>
+        </div>
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="@registration_SmtpPort.Name">SMTP Port</label>
+            <div class="col-md-8">
+                <input type="text" class="form-control input-md app-settings" id="@registration_SmtpPort.Name" name="@registration_SmtpPort.Name" value="@registration_SmtpPort.Value">
+                <span class="help-block">The port for SMTP server used for sending emails</span>
+            </div>
+        </div>
+        <!-- Checkboxes SSL-->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="@registration_SmtpNetworkDeliveryMethodEnabled.Name">SSL</label>
+            <div class="col-md-8">
+                <div class="checkbox">
+                    <label for="@registration_SmtpNetworkDeliveryMethodEnabled.Name">
+                        <input type="checkbox" class="app-settings" id="@registration_SmtpNetworkDeliveryMethodEnabled.Name" name="@registration_SmtpNetworkDeliveryMethodEnabled.Name" @if (registration_SmtpNetworkDeliveryMethodEnabled.Value == "true") { @Html.Raw("checked")          } />
+                        Enable SSL connection between application and mail server
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+

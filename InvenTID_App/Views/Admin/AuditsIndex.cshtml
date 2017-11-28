@@ -1,0 +1,175 @@
+﻿@model PagedList.IPagedList<InvenTID_App.Models.AUDITEVENT>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Audits";
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+        function DeleteAudit(id) {
+            BootstrapDialog.confirm({
+                title: 'WARNING',
+                message: "Are you sure you want to permanently delete this Audit?",
+                type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+                callback: function (result) {
+                    if (result) {
+                        // delete it!
+                        //demonstrates using a dialog confirmation using JavaScript and NOT JQuery...
+                        var _url = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1) + "AuditDelete/" + id;
+                        window.location.href = _url;
+                    }
+                }
+            });
+        };
+
+ </script>
+    <fieldset>
+        <legend>
+            <h3 style="font-weight:bold; font-size:x-large">
+                Audits
+            </h3>
+        </legend>
+        <div class="form-inline">
+            <table>
+                <tr>
+                    <td><button class="btn btn-danger" id="remove-event">Remove</button>&nbsp;</td>
+                    <td><button class="btn btn-danger" id="remove-event-all">Remove All</button>&nbsp;</td>
+                    <td>
+                        @using (Html.BeginForm("AuditsIndex", "Admin", System.Web.Mvc.FormMethod.Get, new { @class = "form-inline" }))
+                        {
+                            @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { style = "width:450px", @class = "form-control" })
+                            <input type="submit" value="Search" class="btn btn-default" />
+                        }
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        
+        <div>
+            <table id="AuditTable" style="width: 100%" class="table table-striped table-condensed">
+                <tr>
+                    <th style="text-align:center;width:3%"><input type="checkbox" class="audit-event-select-all-chb" /></th>
+                    <th>@Html.ActionLink("Created", "AuditsIndex", new { sortOrder = ViewBag.DateSortParm, currentFilter = ViewBag.CurrentFilter })</th>
+                    <th>EventID</th>
+                    <th>EventType</th>
+                    <th>IPAdress</th>
+                    <th>@Html.ActionLink("MemberEmail", "AuditsIndex", new { sortOrder = ViewBag.NameSortParm, currentFilter = ViewBag.CurrentFilter })</th>
+                    <th>Description</th>
+                </tr>
+                @{if (Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                        InvenTID_App.Models.ApplicationUser usr = InvenTID_App.ApplicationUserManager.GetUser(int.Parse(item.MemberEmail));
+                        <tr>
+                            <td style="text-align:center"><input id="audit-event-select-@item.EventID" class="audit-event-select" data-audit-event-id="@item.EventID" type="checkbox" /></td>
+                            <td>@item.Created</td>
+                            <td>@item.EventID</td>
+                            <td>@item.EventType</td>
+                            <td>@item.IPAddress</td>
+                            <td>@usr.UserName</td>
+                            <td>@item.Description</td>
+                        </tr>
+                    }
+                }
+                }
+            </table>
+            <br />
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+            @Html.PagedListPager(Model, page => Url.Action("AuditsIndex", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+        </div>
+        <br />
+    </fieldset>
+    <script type="text/javascript">
+        $(".audit-event-select-all-chb").prop("checked", false);
+        $('.audit-event-select').prop('checked', false);
+
+        $(".audit-event-select").on('click', function () {
+            $(this).parent().parent().children().toggleClass("alert-info");
+            if ($(".audit-event-select").length == $(".audit-event-select:checked").length) {
+                $(".audit-event-select-all-chb").prop("checked", true);
+            } else {
+                $(".audit-event-select-all-chb").prop("checked", false);
+            }
+        });
+
+        $(".audit-event-select-all-chb").on("change", function (e) {
+            $(".audit-event-select").prop("checked", $(this).prop("checked"));
+            if ($(this).prop('checked') == true) {
+                $(".audit-event-select").parent().parent().children().addClass("alert-info");
+            }
+            else {
+                $(".audit-event-select").parent().parent().children().removeClass("alert-info");
+            }
+        });
+
+        $("#remove-event-all").on("click", function (e) {
+            BootstrapDialog.confirm({
+                title: 'WARNING',
+                message: "Are you sure to remove all items?",
+                type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+                callback: function (result) {
+                    if (result) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Admin/RemoveAuditEvents",
+                            dataType: "json",
+                            contentType: 'application/json; charset=utf-8',
+                            data: {},
+                            cache: false,
+                            success: function (data) {
+                                BootstrapDialog.alert(data.Message, function (e) {
+                                    window.location.href = "/Admin/AuditsIndex";
+                                });
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        /////////////////////////////////////////////////////////////////////////////
+        $("#remove-event").on("click", function (e) {
+            var _checked = [];
+
+            $(".audit-event-select").each(function (e) {
+                if ($(this).prop('checked') == true)
+                    _checked.push(parseInt($(this).attr("data-audit-event-id")));
+            });
+
+            if (_checked.length == 0) {
+                BootstrapDialog.alert("Please, select items and try again.");
+                return false;
+            }
+            BootstrapDialog.confirm({
+                title: 'WARNING',
+                message: "Are you sure to remove selected items?",
+                type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+                callback: function (result) {
+                    if (result) {
+                        // Removing file by AJAX request
+                        $.ajax({
+                            type: "POST",
+                            url: "/Admin/RemoveAuditEvents",
+                            dataType: "json",
+                            contentType: 'application/json; charset=utf-8',
+                            data: JSON.stringify(_checked),
+                            cache: false,
+                            success: function (data) {
+                                BootstrapDialog.alert(data.Message, function (e) {
+                                    window.location.href = "/Admin/AuditsIndex";
+                                });
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    </script>

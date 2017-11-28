@@ -1,0 +1,96 @@
+﻿@model InvenTID_App.Models.RoleViewModel
+@{
+    ViewBag.Title = "Edit " + Model.RoleDescription + " Role";
+}
+
+@{if (Model != null)
+  {
+      InvenTID_App.Models.ApplicationRole _model = InvenTID_App.ApplicationRoleManager.GetRole(Model.Id);
+
+    <div class="">
+        @using (Html.BeginForm())
+        {
+            @Html.ValidationSummary(true)
+            @Html.HiddenFor(model => model.Id)
+            <fieldset>
+                <legend>
+                    <h3 style="font-weight:bold; font-size:x-large">
+                        Role Details
+                    </h3>
+                </legend>
+            </fieldset>
+        <div>
+
+
+        <table style='width: 100%'>
+            <tr>
+                <td style='width: 120px;font-weight: bold'>
+                    @Html.LabelFor(model => model.RoleName, new { @class = "control-label" })
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.RoleName, new { @class = "form-control", @readonly = true })
+                    @Html.ValidationMessageFor(model => model.RoleName)
+                </td>
+            </tr>
+            <tr>
+                <td style='font-weight: bold'>
+                    @Html.LabelFor(model => model.RoleDescription, new { @class = "control-label", style = "vertical-align:top" })
+                </td>
+                <td>
+                    @Html.TextAreaFor(model => model.RoleDescription, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.RoleDescription)
+                </td>
+            </tr>
+            <tr>
+                <td style='font-weight: bold'>
+                    @Html.LabelFor(model => model.IsSysAdmin, "System Role")
+                </td>
+                <td>
+                    @Html.CheckBoxFor(model => model.IsSysAdmin, new { @disabled = "disabled" })
+                    @Html.ValidationMessageFor(model => model.IsSysAdmin)
+                </td>
+            </tr>
+        </table>
+        <br />
+        <input class="btn btn-default" type="submit" value="Save" />
+    </div>
+        }
+        <br />
+        <div class="panel panel-default">
+            <div class="panel-heading">Users Associated with this Role</div>
+            <div class="panel-body">
+                <div id="UsersTable">
+                    @Html.Partial("_ListUsersTable4Role", _model)
+                </div>
+                <div>
+                    @Html.Partial("_AddUserToUsersTable4Role", _model)
+                </div>
+                <br />
+                <div>
+                    @Html.ActionLink("Go to Users", "Index", "Admin")
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">Permissions Associated with this Role</div>
+            <div class="panel-body">
+                <div id="PermissionsTable">
+                    @Html.Partial("_ListPermissions", _model)
+                    <br />
+                </div>
+                <div>
+                    @Html.Partial("_AddPermission2PermissionsTable4Role", _model)
+                </div>
+                <br />
+                <div>
+                    @Html.ActionLink("Go to Permissions", "PermissionIndex", "Admin")
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div>
+        @Html.ActionLink("Go to Roles", "RoleIndex", "Admin")
+    </div>
+}
+}

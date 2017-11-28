@@ -1,0 +1,79 @@
+﻿@model IEnumerable<InvenTID_App.Models.ApplicationRole>
+@{
+    ViewBag.Title = "Roles";
+}
+<script type="text/javascript">
+    function DeleteRole(id) {
+        if (id <= 2) { BootstrapDialog.alert("This action is not allow in Demo mode."); return;}
+        BootstrapDialog.confirm({
+            title: 'WARNING',
+            message: "Are you sure you want to permanently delete this role?",
+            type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+            callback: function (result) {
+                if (result) {
+                    // delete it!
+                    //demonstrates using a dialog confirmation using JavaScript and NOT JQuery...
+                    var _url = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1) + "RoleDelete/" + id;
+                    window.location.href =_url;
+                }
+            }
+        });
+    };
+    
+</script>
+<fieldset>
+    <legend>
+        <h3 style="font-weight:bold; font-size:x-large">
+            Roles
+        </h3>
+    </legend>
+    <table id="RoleTable" style="width: 100%" class="table table-condensed">
+        <tr>
+        <th>
+            Role Name
+        </th>
+        <th>
+            Role Description
+        </th>
+        <th>
+            Is System Admin
+        </th>
+        <th style="width: 8%">
+            Action
+        </th>
+        </tr>
+        @{if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.ActionLink(item.Name, "RoleDetails", new { id = item.Id })
+                    </td>
+                    <td>
+                        @item.RoleDescription
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsSysAdmin)
+                    </td>
+                    <td>
+                        <center>
+                            <a href="@Url.Action("RoleEdit", "Admin", new { id = item.Id })" class="btn btn-xs btn-primary">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                            <button name="deleteRole" id="deleteRole" class="btn btn-xs btn-danger" onclick="DeleteRole('@item.Id')"><span class="glyphicon glyphicon-trash"></span></button>
+                        </center>
+                    </td>
+                </tr>
+            }
+        }
+        }
+    </table>
+    <br />
+    <div>
+        <input class="btn btn-default" type="button" value="Create Role" onclick="location.href='@Url.Action("RoleCreate", "Admin")'" />
+        <br />
+    </div>
+</fieldset>
+<br />
+@Html.ActionLink("Go to Users", "Index", "Admin")

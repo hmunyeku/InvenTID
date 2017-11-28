@@ -1,0 +1,124 @@
+﻿@model IEnumerable<InvenTID_App.Models.PARAMETER>
+@{
+    ApplicationParameters AppParams = new ApplicationParameters();
+    var registration_2FADeviceType = AppParams.TwoFADeviceType;
+    var registration_2FAEnabled = AppParams.TwoFAEnabled;
+    var registration_AccountVerificationRequired = AppParams.AccountVerificationRequired;
+    
+    var registration_UserLockoutEnabled = AppParams.UserLockoutEnabled;
+    var registration_AccountLockoutTimeSpan = AppParams.AccountLockoutTimeSpan;
+    var registration_MaxFailedAccessAttemptsBeforeLockout = AppParams.MaxFailedAccessAttemptsBeforeLockout;
+    
+    var registration_PasswordRequireDigit = AppParams.PasswordRequireDigit;
+    var registration_PasswordRequiredLength = AppParams.PasswordRequiredLength;
+    var registration_PasswordRequireLowercase = AppParams.PasswordRequireLowercase;
+    var registration_PasswordRequireNonLetterOrDigit = AppParams.PasswordRequireNonLetterOrDigit;
+    var registration_PasswordRequireUppercase = AppParams.PasswordRequireUppercase;
+
+    var registration_SMSSid = AppParams.SMSSid;
+    var registration_SMSToken = AppParams.SMSToken;
+    var registration_SMSFromPhone = AppParams.SMSFromPhone;
+   
+    var DeviceTypeList = new List<string> { "Email Code", "Phone Code" };
+}
+
+    <div style="margin-top:20px;">
+    <!-- Checkboxes -->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@registration_UserLockoutEnabled.Name">User Lockout Enabled</label>
+        <div class="col-md-4">
+            <div class="checkbox">
+                <label for="@registration_UserLockoutEnabled.Name">
+                    <input type="checkbox" class="app-settings" id="@registration_UserLockoutEnabled.Name" name="@registration_UserLockoutEnabled.Name" @if (registration_UserLockoutEnabled.Value == "true") { @Html.Raw("checked")       } />
+                    Enables User Lockout
+                </label>
+            </div>
+        </div>
+    </div>
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@registration_AccountLockoutTimeSpan.Name">Account Lockout TimeSpan</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control input-md app-settings" id="@registration_AccountLockoutTimeSpan.Name" name="@registration_AccountLockoutTimeSpan.Name" value="@registration_AccountLockoutTimeSpan.Value">
+            <span class="help-block">Enter Account Lockout TimeSpan</span>
+        </div>
+    </div>
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@registration_MaxFailedAccessAttemptsBeforeLockout.Name">Max Failed Access Attempts</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control input-md app-settings" id="@registration_MaxFailedAccessAttemptsBeforeLockout.Name" name="@registration_MaxFailedAccessAttemptsBeforeLockout.Name" value="@registration_MaxFailedAccessAttemptsBeforeLockout.Value">
+            <span class="help-block">Enter Max Failed Access Attempts Before Lockout</span>
+        </div>
+    </div>
+    <!-- Checkboxes 2FA Settings-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@registration_2FAEnabled.Name">2FA Settings</label>
+        <div class="col-md-4">
+            <div class="checkbox">
+                <label for="@registration_2FAEnabled.Name">
+                    <input type="checkbox" class="app-settings" id="@registration_2FAEnabled.Name" name="@registration_2FAEnabled.Name" @if (registration_2FAEnabled.Value == "true") { @Html.Raw("checked")       } />
+                    Enables 2FA
+                </label>
+            </div>
+        </div>
+    </div>
+    <!-- Select Basic 'Email Code' or 'Phone Code'-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@registration_2FADeviceType.Name">2FA Device Type</label>
+        <div class="col-md-4">
+            <select class="form-control app-settings" id="@registration_2FADeviceType.Name" name="@registration_2FADeviceType.Name">
+                @foreach (string DeviceType in DeviceTypeList)
+                {
+                    if (DeviceType != null && DeviceType == registration_2FADeviceType.Value)
+                    {
+                        <option selected="selected" value="@DeviceType">@DeviceType</option>
+                    }
+                    else
+                    {
+                        <option value="@DeviceType">@DeviceType</option>
+                    }
+                }
+                                      
+            </select>
+        </div>
+    </div>
+    <!-- Checkboxes AccountVerificationRequired-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@registration_AccountVerificationRequired.Name">Account Verification Required</label>
+        <div class="col-md-4">
+            <div class="checkbox">
+                <label for="@registration_AccountVerificationRequired.Name">
+                    <input type="checkbox" class="app-settings" id="@registration_AccountVerificationRequired.Name" name="@registration_AccountVerificationRequired.Name" @if (registration_AccountVerificationRequired.Value == "true") { @Html.Raw("checked")        } />
+                    Enables Account Verification Required
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@registration_SMSSid.Name">SMS Sid</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control input-md app-settings" id="@registration_SMSSid.Name" name="@registration_SMSSid.Name" value="@registration_SMSSid.Value">
+            <span class="help-block">Enter SMS Sid</span>
+        </div>
+    </div>
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@registration_SMSToken.Name">SMSToken</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control input-md app-settings" id="@registration_SMSToken.Name" name="@registration_SMSToken.Name" value="@registration_SMSToken.Value">
+            <span class="help-block">Enter SMS Token</span>
+        </div>
+    </div>
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="@registration_SMSFromPhone.Name">SMS From Phone</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control input-md app-settings" id="@registration_SMSFromPhone.Name" name="@registration_SMSFromPhone.Name" value="@registration_SMSFromPhone.Value">
+            <span class="help-block">Enter SMS From Phone</span>
+        </div>
+    </div>
+
+</div>

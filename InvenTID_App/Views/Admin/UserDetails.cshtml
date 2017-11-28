@@ -1,0 +1,32 @@
+﻿@model InvenTID_App.Models.ApplicationUser
+@{
+    ViewBag.Title = "Users";
+}
+@using (Html.BeginForm("UserDetails", "Admin", FormMethod.Post))
+{
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>
+            <h3 style="font-weight:bold; font-size:x-large">
+                User Details
+            </h3>
+        </legend>
+        @Html.Partial("_userDetails", Model)
+        <br />
+        <input class="btn btn-default edit" type="button" value="Edit" onclick="if (@Model.Id == 1) { BootstrapDialog.alert('this action is not allow in demo mode.'); return;};location.href='@Url.Action("UserEdit", "Admin", new { id = Model.Id })' " />
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            <h3>
+                Roles Associated with this User
+            </h3>
+        </legend>
+        <div class="panel" id="RolesTable">
+            @Html.Partial("_ListUserRoleTable", Model)
+        </div>        
+    </fieldset>
+}
+<div>
+    @Html.ActionLink("Go to Users", "Index", "Admin")
+</div>

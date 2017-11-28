@@ -1,0 +1,547 @@
+﻿@using System.Collections
+@using System.Web.Optimization;
+@using System.Web.UI.WebControls
+@using DevExpress.Web;
+@using DevExpress.Web.Mvc;
+@using DevExpress.Web.Mvc.UI;
+@using DevExpress.Web.ASPxThemes;
+@using Microsoft.AspNet.Identity
+
+
+@functions {
+    T CreateButtonItem<T>(string name, string text, string iconID) where T : RibbonButtonItem
+    {
+        return CreateButtonItem<T>(name, text, RibbonItemSize.Small, iconID);
+    }
+    T CreateButtonItem<T>(string name, string text, RibbonItemSize size, string iconID) where T : RibbonButtonItem
+    {
+        var item = Activator.CreateInstance<T>();
+        item.Name = name;
+        item.Text = text;
+        item.Size = size;
+        if (size == RibbonItemSize.Large)
+            item.LargeImage.IconID = iconID;
+        else
+            item.SmallImage.IconID = iconID;
+        return item;
+    }
+
+    void HideEmptyGroup(List<RibbonGroup> ribbonGroup)
+    {
+        foreach (RibbonGroup RibbonGroup in ribbonGroup)
+        {
+            if (RibbonGroup.Items.IsEmpty)
+            {
+                RibbonGroup.Visible = false;
+            }
+        }
+
+    }
+
+    void HideEmptyTab(List<RibbonTab> ribbonTab)
+    {
+        foreach (RibbonTab RibbonTab in ribbonTab)
+        {
+            if (RibbonTab.Groups.GetVisibleItemCount() == 0)
+            {
+                RibbonTab.Visible = false;
+            }
+        }
+    }
+
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta name="viewport" 
+          content="initial-scale=1, 
+            width=device-width, 
+            maximum-scale=1, 
+            user-scalable=no">
+
+    <title>@ViewBag.Title - InvenTID</title>
+    @Scripts.Render("~/bundles/jquery")
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/js")
+    @Scripts.Render("~/bundles/cryptojs")
+    @RenderSection("scripts", required: false)
+
+    @Html.DevExpress().GetStyleSheets(
+        new StyleSheet { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+        new StyleSheet { ExtensionSuite = ExtensionSuite.Editors },
+        new StyleSheet { ExtensionSuite = ExtensionSuite.Icons}
+        )
+    @Html.DevExpress().GetScripts( 
+        new Script { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+        new Script { ExtensionSuite = ExtensionSuite.Editors }
+        )
+
+</head>
+<body>
+<div class="content-wrapper" id="content-wrapper">
+
+<div class="header" id="header">
+
+@Html.DevExpress().Ribbon(settings =>
+{
+    settings.Name = "Ribbon";
+    settings.OneLineMode = true;
+    settings.SetFileTabTemplateContent(c =>
+    {
+        TabControlTemplateContainerBase container = (TabControlTemplateContainerBase) c;
+        if (!container.Active)
+        {
+            ViewContext.Writer.Write(@"<div id=""FileTabtemplateDiv"" class=""fileTabtemplateDiv""></div>");
+        }
+    });
+    settings.ClientSideEvents.CommandExecuted = "OnCommandExecuted";
+    settings.ClientSideEvents.MinimizationStateChanged = "ResizeDivContent";
+    //Declaration groupes de l'onglet General
+    var general = settings.Tabs.Add("General");
+    var quickaccess = general.Groups.Add("Accès Rapide");
+    var check = general.Groups.Add("Contrôle");
+    var evenement = general.Groups.Add("Evénements");
+    var options = general.Groups.Add("Options");
+    var aide = general.Groups.Add("Aide");
+
+    //Declaration groupes de l'onglet Editions
+    var editions = settings.Tabs.Add("Edition");
+    var ops = editions.Groups.Add("Operations");
+    var listes = editions.Groups.Add("Listes");
+    var autreslistes = editions.Groups.Add("Edition");
+    var tcd = editions.Groups.Add("Rapport");
+
+    //Declaration groupes de l'onglet Inventaire
+    var inventaire = settings.Tabs.Add("Inventaire");
+    var inventaire_menu = inventaire.Groups.Add("Reception");
+    var reception = inventaire.Groups.Add("Reception");
+
+    //Declaration groupes de l'onglet Editions
+    var parametres = settings.Tabs.Add("Paramètres");
+    var profil = parametres.Groups.Add("Utilisateurs");
+    var importexport = parametres.Groups.Add("Base de données");
+    var config = parametres.Groups.Add("Configuration");
+
+    //Declaration champs du Groupe Quick-Access dans onglet General
+    quickaccess.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "accueil";
+        i.Text = "Accueil";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Retour à la fenêtre principale du logiciel";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.NavigationHome16x16office2013;
+    });
+
+    quickaccess.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "actualiser";
+        i.Text = "Actualiser";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Actualiser la page";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsRefresh16x16;
+    });
+    //Fin Declaration champs du Groupe Quick-Access dans onglet General
+
+    //Declaration champs du Groupe Check dans onglet General
+    check.Items.Add(MVCxRibbonItemType.TextBoxItem, i =>
+    {
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Scanner ou taper EPC / libellé d'un outil";
+    });
+
+    if (HttpContext.Current.User.HasPermission("utiliser-outil"))
+    {
+        check.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "check_in";
+            i.Text = "Check-In";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Enregistrer une remise de materiel en stock apres usage";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.NavigationPrevious16x16;
+        });
+
+        check.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "check_out";
+            i.Text = "Check-Out";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Monter/Completer un dossier d'empreint materiel";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.NavigationNext16x16;
+        });
+    }
+
+    //Declaration champs du Groupe Check dans onglet General
+
+    //Declaration champs du Groupe Evenements dans onglet General
+    if (HttpContext.Current.User.HasPermission("declarer-incident"))
+    {
+        evenement.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "incident";
+            i.Text = "Incident";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Declarer un incident sur l'outil scanné";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.BusinessobjectsBorules16x16;
+        });
+        //Fin Declaration champs du Groupe Evenements dans onglet General
+    }
+    //Declaration champs du Groupe Options dans onglet General
+
+    if (HttpContext.Current.User.HasPermission("editer-outil"))
+    {
+        options.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "editer_outil";
+            i.Text = "Editer";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Créer un nouvel outil ou editer sa fiche descriptive";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsEditname16x16;
+        });
+    }
+    if (HttpContext.Current.User.HasPermission("imprimer-liste"))
+    {
+        var listeImprimer = CreateButtonItem<RibbonDropDownButtonItem>("Imprimer", "Imprimer", RibbonItemSize.Small, IconID.ProgrammingShowtestreport16x16);
+        listeImprimer.ItemStyle.Width = Unit.Pixel(110);
+        listeImprimer.Items.Add(
+            CreateButtonItem<RibbonDropDownButtonItem>("Fiche_Item", "Fiche Item", IconID.ExportExporttopdf16x16),
+            CreateButtonItem<RibbonDropDownButtonItem>("Journal_mouvements", "Journal mouvements", IconID.ExportExporttotxt16x16),
+            CreateButtonItem<RibbonDropDownButtonItem>("Journal_incident", "Journal incident", IconID.ExportExporttoxml16x16)
+            );
+        options.Items.Add(listeImprimer);
+    }
+    if (HttpContext.Current.User.HasPermission("afficher-statuts"))
+    {
+        options.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "statuts";
+            i.Text = "Statuts";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Afficher la liste des dossiers d'empreint d'outils en cours";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsOpen16x16;
+        });
+    }
+    options.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "fullscreen";
+        i.Text = "Plein écran";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Basculer l'affichage";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsChangeview16x16devav;
+    });
+    options.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "logout";
+        i.Text = "Deconnexion";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Se deconnecter";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsClose16x16;
+    });
+
+    //Fin Declaration champs du Groupe Evenements dans onglet General
+    //Debut declaration champs du Groupe Aide dans onglet General
+    aide.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "aide";
+        i.Text = "Aide";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Acceder à l'aide du logiciel";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.ReportsParameters16x16;
+    });
+    //Fin declaration champs du Groupe Aide dans onglet General
+    if (HttpContext.Current.User.HasPermission("editer-outil"))
+    {
+        //Debut declration champs du Groupe Listes dans onglet Editions
+        ops.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "cloner";
+            i.Text = "Cloner";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Cloner l'outil portant le tag scanné";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsMerge16x16;
+        });
+    }
+    if (HttpContext.Current.User.HasPermission("affecter-outil"))
+    {
+        ops.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "affecter";
+            i.Text = "Affecter";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Affecter l'outil à un tier";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.PeopleCustomer16x16;
+        });
+    }
+    if (HttpContext.Current.User.HasPermission("gerer-utilisateurs"))
+    {
+        listes.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "liste_personnel";
+            i.Text = "Personnel";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Gérer les utilisateurs/Techniciens";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.BusinessobjectsBodepartment16x16;
+        });
+    }
+
+    if (HttpContext.Current.User.HasPermission("gerer-outils"))
+    {
+        listes.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "liste_outils";
+            i.Text = "Outils";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Liste d'outils";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsNew16x16;
+        });
+        listes.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "liste_kits";
+            i.Text = "Kits";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Liste de Kits d'outils";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsGroup16x16;
+        });
+        //Fin declration champs du Groupe Listes dans onglet Editions
+    }
+
+    if (HttpContext.Current.User.HasPermission("gerer-listes"))
+    {
+        //Début declaration champs du Groupe autres listes dans onglet Editions
+
+        var autresListesOptions = CreateButtonItem<RibbonDropDownButtonItem>("editer_autreslistes", "Listes", RibbonItemSize.Small, IconID.ProgrammingShowtestreport16x16);
+        autresListesOptions.ItemStyle.Width = Unit.Pixel(110);
+        autresListesOptions.Items.Add(
+            CreateButtonItem<RibbonDropDownButtonItem>("site_ops", "Sites d'operations", IconID.NavigationHome16x16gray),
+            CreateButtonItem<RibbonDropDownButtonItem>("categorie_outil", "Categories d'outils", IconID.BusinessobjectsBofolder16x16),
+            CreateButtonItem<RibbonDropDownButtonItem>("type_outil", "Portée d'outils", IconID.MiscellaneousFolderpanel16x16)
+            );
+        autreslistes.Items.Add(autresListesOptions);
+    }
+
+    //Fin declaration champs du Groupe autres listes dans onglet Editions
+    if (HttpContext.Current.User.HasPermission("gerer-rapports"))
+    {
+        //Début declaration champs du Groupe Rapport TCD dans onglet Editions
+        tcd.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "rapports_tcd";
+            i.Text = "Rapport TCD";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Générer des rapports TCD à imprimer";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.ReportsParameters16x16;
+        });
+        //Fin declaration champs du Groupe Rapport TCD dans onglet Editions
+    }
+    if (HttpContext.Current.User.HasPermission("faire-inventaire"))
+    {
+        reception.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "faire-inventaire";
+            i.Text = "Inventaire";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Réaliser un inventaire d'items";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.BusinessobjectsBotask16x16;
+        });
+    }
+
+    if (HttpContext.Current.User.HasPermission("valider-inventaire"))
+    {
+        reception.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "valider-inventaire";
+            i.Text = "Clore/Valider";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Valider un inventaire d'items";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.ContentCheckbox16x16office2013;
+        });
+    }
+    if (HttpContext.Current.User.HasPermission("reception-lot"))
+        inventaire_menu.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+        {
+            i.Name = "reception_items";
+            i.Text = "Reception";
+            i.Size = RibbonItemSize.Small;
+            i.ToolTip = "Enregistrer un renouvellement de stock";
+            ((RibbonButtonItem) i).SmallImage.IconID = IconID.NavigationForward16x16;
+        });
+
+    //Début declaration champs du Groupe profil listes dans onglet Paramètres
+    profil.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "mon_profil";
+        i.Text = "Mon profil";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Modifier le profil de connexion";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.BusinessobjectsBoperson16x16;
+    });
+
+    profil.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "roles";
+        i.Text = "Rôles";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Modifier les rôles des utilisateurs";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.BusinessobjectsBorole16x16;
+    });
+    profil.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "permissions";
+        i.Text = "Permissions";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Modifier les permissions des utilisateurs";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.BusinessobjectsBopermission16x16;
+    });
+    //Fin declaration champs du Groupe profil listes dans onglet Paramètres
+    importexport.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "bdsauveg";
+        i.Text = "Sauvegarder BD";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Sauvegarder la base de données";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.SaveSave16x16;
+    });
+    importexport.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "bdrestaure";
+        i.Text = "Restaurer BD";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Restaurer la base de données";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsReset16x16;
+    });
+    importexport.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "data_import";
+        i.Text = "Importer données";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Importer une liste des données au format csv (avancé)";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsImportimage16x16;
+    });
+    importexport.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "data_export";
+        i.Text = "Exporter données";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Exporter des listes des données au format csv (avancé)";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.ExportExport16x16;
+    });
+
+    config.Items.Add(MVCxRibbonItemType.ButtonItem, i =>
+    {
+        i.Name = "parametres";
+        i.Text = "Configuration";
+        i.Size = RibbonItemSize.Small;
+        i.ToolTip = "Configurer l'application";
+        ((RibbonButtonItem) i).SmallImage.IconID = IconID.ActionsSearch16x16devav;
+    });
+
+    List<RibbonGroup> listGroup = new List<RibbonGroup>();
+    
+        //Onglet General
+    listGroup.Add(quickaccess);
+    listGroup.Add(check);
+    listGroup.Add(evenement);
+    listGroup.Add(options);
+    listGroup.Add(aide);
+        //Onglet Editions
+    listGroup.Add(ops);
+    listGroup.Add(listes);
+    listGroup.Add(autreslistes);
+    listGroup.Add(tcd);
+        //onglet Inventaire
+    listGroup.Add(inventaire_menu);
+    listGroup.Add(reception);
+        //onglet Parametres
+    listGroup.Add(profil);
+    listGroup.Add(importexport);
+    listGroup.Add(config);
+
+    List<RibbonTab> listTab = new List<RibbonTab>();
+
+    listTab.Add(general);
+    listTab.Add(editions);
+    listTab.Add(inventaire);
+    listTab.Add(parametres);
+
+    HideEmptyGroup(listGroup);
+    HideEmptyTab(listTab);
+
+
+}).GetHtml()
+    
+@Html.Hidden("keydecrypt","Password64!")
+@Html.Hidden("accueil",@Url.Action("Index","Main"))
+@Html.Hidden("mon_profil",@Url.Action("Index","Manage"))
+@Html.Hidden("roles", @Url.Action("RoleIndex", "Admin"))
+@Html.Hidden("permissions",@Url.Action("PermissionIndex","Admin"))
+@Html.Hidden("parametres", @Url.Action("SettingsIndex", "Admin"))
+
+@*@{
+    var balise =
+    Html.DevExpress().Button(
+    settings => {
+                    settings.Name = "logoff";
+                    settings.Text = "";
+                    settings.Width = 24;
+                    settings.ClientSideEvents.CheckedChanged = "logoff";
+                    settings.ImagePosition = ImagePosition.Left;
+                    settings.Images.Image.IconID = IconID.ActionsClose16x16;
+                    settings.EnableTheming = false;
+    })
+    .GetHtml().ToString();
+}
+<script>
+    var balise =@balise;
+    extraButtons2RightRibbon(balise);
+</script>*@
+
+</div>
+
+<div class="content" id="content">
+    @RenderBody()
+</div>
+
+<div class="footer">
+    <div class="footer-left">
+
+        <div class="led" id="led_rfid_scanner_state">
+        </div>
+        <div class="led" id="led_rfid_scan_read_state">
+        </div>
+
+        <div class="username-logo">
+        </div>
+        <div class="user-name">
+            
+            @if (Request.IsAuthenticated)
+            {
+                using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @Html.ActionLink("Bonjour " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new {title = "Manage"})
+                }
+            }
+            
+        </div>
+
+
+    </div>
+    <div class="footer-center">
+    </div>
+    <div class="footer-right">
+        <div class="logo_bin">
+            <a href="http://www.bingroup.com/" title="Acceder au site internet de Bingroup">
+                <img src="~/Content/img/logo_bin.png"/></a>
+        </div>
+    </div>
+</div>
+</div>
+    
+
+</body>
+</html>

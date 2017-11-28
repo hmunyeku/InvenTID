@@ -1,0 +1,65 @@
+﻿@model InvenTID_App.Models.RoleViewModel
+@{
+    ViewBag.Title = "Role: " + Html.DisplayFor(model => model.RoleDescription);
+}
+
+@{if (Model != null)
+  {
+      InvenTID_App.Models.ApplicationRole _model = InvenTID_App.ApplicationRoleManager.GetRole(Model.Id);
+    
+      <div class="row">
+        <div class="">
+            <fieldset>
+                <legend>
+                    <h3 style="font-weight:bold; font-size:x-large">
+                        Role Details
+                    </h3>
+                </legend>
+                    <table style='width: 100%'>
+                        <tr>
+                            <td style='width: 120px;font-weight: bold' class='userTable'>
+                                @Html.LabelFor(model => model.RoleName)
+                            </td>
+                            <td class='userTable'>
+                                @Html.DisplayFor(model => model.RoleName, new { style = "width:350px" })
+                                @Html.ValidationMessageFor(model => model.RoleName)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style='font-weight: bold' class='userTable'>
+                                @Html.LabelFor(model => model.RoleDescription)
+                            </td>
+                            <td class='userTable'>
+                                @Html.DisplayFor(model => model.RoleDescription, new { style = "width:90%" })
+                                @Html.ValidationMessageFor(model => model.RoleDescription)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style='width: 100px; font-weight: bold' class='userTable'>
+                                @Html.LabelFor(model => model.IsSysAdmin, "System Role")
+                            </td>
+                            <td class='userTable'>
+                                @Html.DisplayFor(model => model.IsSysAdmin)
+                                @Html.ValidationMessageFor(model => model.IsSysAdmin)
+                            </td>
+                        </tr>
+                    </table>
+                    <br />
+                    <input class="btn btn-default" type="button" value="Edit" onclick="location.href='@Url.Action("RoleEdit", "Admin", new { id = Model.Id })'" />
+            </fieldset>
+            <br />
+            <div class="panel panel-default">
+                <div class="panel-heading">Permissions Associated with this Role</div>
+                <div class="panel-body">
+                    <div id="PermissionsTable">
+                        @Html.Partial("_ListPermissions", _model)
+                    </div>
+                </div>
+            </div>
+        </div>
+        @Html.ActionLink("Go to Roles", "RoleIndex", "Admin")
+    </div>
+    
+}
+}
